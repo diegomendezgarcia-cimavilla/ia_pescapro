@@ -1,1 +1,35 @@
 
+import pandas as pd
+import numpy as np
+
+# 1️⃣ Cargar dataset base
+df = pd.read_csv("dataset_pesca_cantabrico.csv")
+
+# 2️⃣ Añadir variables tecnológicas / atmosféricas
+df["temp_superficie"] = df["temp_agua"] + np.random.normal(0,0.5,len(df))
+df["salinidad"] = 35 + np.random.normal(0,0.5,len(df))
+df["oxigeno_disuelto"] = 8 + np.random.normal(0,0.3,len(df))
+df["ph_agua"] = 8 + np.random.normal(0,0.05,len(df))
+
+# 3️⃣ Integrar sabiduría tradicional
+df["actividad_pulpo"] = np.where(
+    (df["visibilidad_agua"]=="turbia") & (df["coef_marea"]>80) & (df["mes"].isin([6,7,8])),
+    1,0
+)
+df["actividad_percebe"] = np.where(
+    (df["coef_marea"]>90) & (df["oleaje"]<2),
+    1,0
+)
+df["actividad_lubina"] = np.where(
+    (df["oleaje"]>1) & (df["oleaje"]<3) & (df["viento"]<20),
+    1,0
+)
+
+# 4️⃣ Actualizar capturas
+df["captura_pulpo"] = df["captura_pulpo"] * (1 + df["actividad_pulpo"])
+df["captura_percebe"] = df["captura_percebe"] * (1 + df["actividad_percebe"])
+df["captura_lubina"] = df["captura_lubina"] * (1 + df["actividad_lubina"])
+
+# 5️⃣ Guardar dataset mejorado
+df.to_csv("dataset_pesca_cantabrico_mejorado.csv", index=False)
+print("✅ Dataset mejorado listo para usar")
